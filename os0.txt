@@ -43,41 +43,41 @@ root/usr/os/os0.c  4:
 root/usr/os/os0.c  5: int current;
 root/usr/os/os0.c  6: 
 root/usr/os/os0.c  7: out(port, val)  { asm(LL,8); asm(LBL,16); asm(BOUT); }
-00000000  0000080e  LL    0x8 (D 8)
-00000004  00001026  LBL   0x10 (D 16)
-00000008  0000009a  BOUT
+00000000  0000080e  LL    0x8 (D 8)	//a = *(sp + 8)
+00000004  00001026  LBL   0x10 (D 16)	//b = *(sp + 16)
+00000008  0000009a  BOUT		//a = write(a, &b, 1)
 root/usr/os/os0.c  8: ivec(void *isr) { asm(LL,8); asm(IVEC); }
-0000000c  00000002  LEV   0x0 (D 0)
-00000010  0000080e  LL    0x8 (D 8)
-00000014  000000a4  IVEC
+0000000c  00000002  LEV   0x0 (D 0)	//pc = *sp, sp += 8 
+00000010  0000080e  LL    0x8 (D 8)	//a = *(sp + 8)
+00000014  000000a4  IVEC		//ivec = a
 root/usr/os/os0.c  9: stmr(int val)   { asm(LL,8); asm(TIME); }
-00000018  00000002  LEV   0x0 (D 0)
-0000001c  0000080e  LL    0x8 (D 8)
-00000020  000000a7  TIME
+00000018  00000002  LEV   0x0 (D 0)	//pc = *sp, sp += 8
+0000001c  0000080e  LL    0x8 (D 8)	//a = *(sp + 8)
+00000020  000000a7  TIME		//timeout = a
 root/usr/os/os0.c  10: halt(val)       { asm(LL,8); asm(HALT); }
-00000024  00000002  LEV   0x0 (D 0)
-00000028  0000080e  LL    0x8 (D 8)
-0000002c  00000000  HALT
+00000024  00000002  LEV   0x0 (D 0)	//pc = *sp, sp += 8
+00000028  0000080e  LL    0x8 (D 8)	//a = *(sp + 8)
+0000002c  00000000  HALT		//halt system
 root/usr/os/os0.c  11: 
 root/usr/os/os0.c  12: alltraps()
-00000030  00000002  LEV   0x0 (D 0)
+00000030  00000002  LEV   0x0 (D 0)	//pc = *sp, sp += 8
 root/usr/os/os0.c  13: {
 root/usr/os/os0.c  14:   asm(PSHA);
-00000034  0000009d  PSHA
+00000034  0000009d  PSHA		//sp -= 8, *sp = a
 root/usr/os/os0.c  15:   asm(PSHB);
-00000038  000000a0  PSHB
+00000038  000000a0  PSHB		//sp -= 8, *sp = b
 root/usr/os/os0.c  16: 
 root/usr/os/os0.c  17:   current++;
-0000003c  00000015  LG    0x0 (D 0)
-00000040  ffffff57  SUBI  0xffffffff (D -1)
-00000044  00000045  SG    0x0 (D 0)
+0000003c  00000015  LG    0x0 (D 0)	//a = *(pc)
+00000040  ffffff57  SUBI  0xffffffff (D -1)	//a += 1
+00000044  00000045  SG    0x0 (D 0)	//*(pc) = a
 root/usr/os/os0.c  18: 
 root/usr/os/os0.c  19:   asm(POPB);
-00000048  000000a1  POPB
+00000048  000000a1  POPB		//b = *sp, sp += 8
 root/usr/os/os0.c  20:   asm(POPA);
-0000004c  000000a3  POPA
+0000004c  000000a3  POPA		//a = *sp, sp += 8
 root/usr/os/os0.c  21:   asm(RTI);
-00000050  00000098  RTI 
+00000050  00000098  RTI 		//return from interrupt
 root/usr/os/os0.c  22: }
 root/usr/os/os0.c  23: 
 root/usr/os/os0.c  24: main()
