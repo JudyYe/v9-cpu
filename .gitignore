@@ -9,7 +9,6 @@ os1
 os2
 os3
 build
-os*.txt
 backup*
 root/bin/c
 fs.img
