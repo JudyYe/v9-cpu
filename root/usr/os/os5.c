@@ -43,8 +43,9 @@ enum { // processor fault codes
 
 
 char pg_mem[19 * 4096]; // page dir + 16 kernel entries + 1 user entry + alignment
+int *pg_dir, *pg0, *pg1, *pg2, *pg3;
 
-int *pg_dir, *pg_tbl[16];
+int *f, *pg_tbl[16];
 
 //char user_mem[4*4096*4096+4096]; //user space
 //int user_begin=32*1024*1024; //user start addr
@@ -139,9 +140,28 @@ setup_user_paging()
 {
   //YOUR CODE: lec7-spoc challenge-part2
 }
-  
+
+
 setup_kernel_paging()
 {
+	  int i, j;
+	  int pg_table[16];
+	  pg_dir = (int *)((((int)&pg_mem) + 4095) & -4096);
+	  pg0 = pg_dir;
+	  for (i = 0; i < 16; ++i) {
+		  pg0 = pg0+1024;
+		  pg_dir[i + 768] = (int)pg0 | PTE_P | PTE_W | !PTE_U;
+	  }
+
+	pg0 = pg_dir;
+	for (j = 0; j < 16; ++j) {
+		pg0 = pg0 + 1024;
+		for (i = 0; i < 1024; ++i) {
+			pg0[i] = ((j << 22)&0x1fffffff) | (i << 12) | PTE_P | PTE_W | !PTE_U;
+		}
+	}
+	pg_dir[0] = pg_dir[768];
+
   //YOUR CODE: lec7-spoc challenge-part1
 }
 
@@ -176,6 +196,7 @@ main()
   asm(SSP); // sp = a
   printf("set page table....\n"); 
   setup_kernel_paging();
+
   setup_user_paging();
   printf("set page table over\n"); 
   
@@ -184,7 +205,11 @@ main()
   pdir(pg_dir);
   // enable page
   spage(1);
-  
+
+//  pg_dir = +0xc0000000+(uint)pg_dir;
+//  // jump (via return) to high memory
+//  ksp = 0xc0000000+(((uint)kstack + sizeof(kstack) - 8) & -8);
+
   printf("kernel and user map...ok\n");
   
   printf("test kernel page fault read 1...\n");
