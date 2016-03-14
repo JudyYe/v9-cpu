@@ -139,13 +139,20 @@ alltraps()
 setup_user_paging()
 {
   //YOUR CODE: lec7-spoc challenge-part2
+	int i;
+	pg_dir = (int *)((((int)&pg_mem) + 4095) & -4096);
+	pg0 = pg_dir + 1024*17;
+	pg_dir[256] = (int)pg0 | PTE_P | PTE_W | PTE_U;
+	for (i = 0; i < 1024; ++i) {
+		pg0[i] = i << 12 | PTE_P | PTE_W | PTE_U;
+	}
+
 }
 
 
 setup_kernel_paging()
 {
 	  int i, j;
-	  int pg_table[16];
 	  pg_dir = (int *)((((int)&pg_mem) + 4095) & -4096);
 	  pg0 = pg_dir;
 	  for (i = 0; i < 16; ++i) {
